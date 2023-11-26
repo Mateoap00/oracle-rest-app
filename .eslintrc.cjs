@@ -28,6 +28,7 @@ module.exports = {
         'react/prop-types': 0,
         'react/react-in-jsx-scope': 'off',
         'prettier/prettier': 'error',
+        '@typescript-eslint/consistent-type-definitions': 0,
     },
     parserOptions: {
         project: './tsconfig.json',
