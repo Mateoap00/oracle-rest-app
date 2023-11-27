@@ -1,7 +1,11 @@
 import { createContext, useReducer, useContext, ReactNode } from 'react';
+import { EventRequest } from './services/eventsService';
 
 type AppState = {
-    isEditing: boolean;
+    editing: {
+        isEditing: boolean;
+        eventReq: EventRequest | undefined;
+    };
     isAdding: boolean;
 };
 
@@ -16,16 +20,31 @@ type AppContextType = {
 };
 
 const initialState: AppState = {
-    isEditing: false,
+    editing: {
+        isEditing: false,
+        eventReq: undefined,
+    },
     isAdding: true,
 };
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
     switch (action.type) {
         case 'SET_EDIT_MODE':
-            return { isEditing: true, isAdding: false };
+            return {
+                editing: {
+                    isEditing: true,
+                    eventReq: action.payload as EventRequest,
+                },
+                isAdding: false,
+            };
         case 'SET_ADD_MODE':
-            return { isEditing: false, isAdding: true };
+            return {
+                editing: {
+                    isEditing: false,
+                    eventReq: undefined,
+                },
+                isAdding: true,
+            };
         default:
             return state;
     }

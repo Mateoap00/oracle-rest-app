@@ -40,7 +40,25 @@ export const createEventRequest = async (eventReq: EventRequest) => {
         baseUrl,
         eventReq
     );
-    console.log(response);
     const data: EventRequest = response.data;
     return data;
+};
+
+export const updateEventRequest = async (eventReq: EventRequest) => {
+    const response: AxiosResponse<EventRequest> = await axios.put(
+        baseUrl,
+        eventReq
+    );
+    const data: EventRequest = response.data;
+    return data;
+};
+
+export const deleteEventRequest = async (eventno: string) => {
+    try {
+        await axios.delete(baseUrl, {
+            data: { eventno },
+        });
+    } catch (err) {
+        console.log(err);
+    }
 };

@@ -3,7 +3,6 @@ import { getEventsRequest } from './services/eventsService';
 import { getCustomers } from './services/customersService';
 import { getFacilities } from './services/facilitiesService';
 import EventsForm from './components/EventsForm';
-import { ActionButtons } from './components/ActionButtons';
 import EventsTable from './components/EventsTable';
 
 function App() {
@@ -48,13 +47,10 @@ function App() {
     const customers = customersQuery.data;
     const facilities = facilitiesQuery.data;
     console.log(eventsReq);
-    console.log(customers);
-    console.log(facilities);
 
     return (
         <>
             <EventsForm customers={customers} facilities={facilities} />
-            <ActionButtons />
             <EventsTable eventsReq={eventsReq} />
         </>
     );

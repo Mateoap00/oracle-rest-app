@@ -1,10 +1,15 @@
 import { EventRequest } from '../services/eventsService';
+import { useAppContext } from '../AppContext';
+import { EventsRow } from './EventsRow';
 
 type EventsTableProps = {
     eventsReq: EventRequest[];
 };
 
 const EventsTable: React.FC<EventsTableProps> = ({ eventsReq }) => {
+    // const { dispatch } = useAppContext();
+    const editMode = useAppContext().state.editing.isEditing;
+    const eventReq = useAppContext().state.editing.eventReq;
     return (
         <>
             <div className="overflow-x-auto">
@@ -46,64 +51,21 @@ const EventsTable: React.FC<EventsTableProps> = ({ eventsReq }) => {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {eventsReq.map((eventReq) => {
-                            return (
-                                <tr key={eventReq.eventno}>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        <input
-                                            type="checkbox"
-                                            className="form-checkbox h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                            checked={true}
-                                            onChange={() => {
-                                                console.log('checked');
-                                            }}
-                                        />
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-black">
-                                        {eventReq.eventno}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.budno}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.custno}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.facno}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.datereq}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.dateheld}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.dateauth}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.estaudience}
-                                    </td>
-                                    <td className="whitespace-nowrap px-4 py-2 text-gray-900 dark:text-gray-200">
-                                        {eventReq.estcost}
-                                    </td>
-                                    {eventReq.status === 'Approved' ? (
-                                        <td className="whitespace-nowrap px-4 py-2 text-green-600 dark:text-gray-200">
-                                            {eventReq.status}
-                                        </td>
-                                    ) : null}
-                                    {eventReq.status === 'Pending' ? (
-                                        <td className="whitespace-nowrap px-4 py-2 text-yellow-600 dark:text-gray-200">
-                                            {eventReq.status}
-                                        </td>
-                                    ) : null}
-                                    {eventReq.status === 'Denied' ? (
-                                        <td className="whitespace-nowrap px-4 py-2 text-red-600 dark:text-gray-200">
-                                            {eventReq.status}
-                                        </td>
-                                    ) : null}
-                                </tr>
-                            );
-                        })}
+                        {editMode && eventReq ? (
+                            <EventsRow
+                                key={eventReq.eventno}
+                                eventReq={eventReq}
+                            />
+                        ) : (
+                            eventsReq.map((eventReq) => {
+                                return (
+                                    <EventsRow
+                                        key={eventReq.eventno}
+                                        eventReq={eventReq}
+                                    />
+                                );
+                            })
+                        )}
                     </tbody>
                 </table>
             </div>

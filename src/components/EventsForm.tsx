@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { EventRequest, createEventRequest } from '../services/eventsService';
+import {
+    EventRequest,
+    createEventRequest,
+    updateEventRequest,
+    deleteEventRequest,
+} from '../services/eventsService';
 import { Customers } from '../services/customersService';
 import { Facilities } from '../services/facilitiesService';
 import { useAppContext } from '../AppContext';
-import DatePicker from 'react-datepicker';
 import { formatDate } from '../utils/formatDate';
+import { reverseFormatDate } from '../utils/reverseFormatDate';
 import { generateEventNo } from '../utils/generateEventNo';
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ActionButtons } from './ActionButtons';
 
 type EventsFormProps = {
     customers: Customers[];
@@ -15,20 +22,8 @@ type EventsFormProps = {
 };
 
 const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
-    // const { dispatch } = useAppContext();
-    const editMode = useAppContext().state.isEditing;
-    const addMode = useAppContext().state.isAdding;
-
-    const [customer, setCustomer] = useState<string>('');
-    const [facility, setFacility] = useState<string>('');
-    const [dateReq, setDateReq] = useState<Date | null>(null);
-    const [dateHeld, setDateHeld] = useState<Date | null>(null);
-    const [dateAuth, setDateAuth] = useState<Date | null>(null);
-    const [estAudience, setEstAudience] = useState<number>(0);
-    const [estCost, setEstCost] = useState<number>(0);
-    const [status, setStatus] = useState<string>('Pending');
-
     const queryClient = useQueryClient();
+
     const createEventReqMutation = useMutation({
         mutationFn: createEventRequest,
         onSuccess: () => {
@@ -36,14 +31,77 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
         },
     });
 
+    const updateEventReqMutation = useMutation({
+        mutationFn: updateEventRequest,
+        onSuccess: () => {
+            queryClient.invalidateQueries('eventsRequest');
+            dispatch({ type: 'SET_ADD_MODE', payload: {} });
+        },
+    });
+
+    const deleteEventReqMutation = useMutation({
+        mutationFn: deleteEventRequest,
+        onSuccess: () => {
+            queryClient.invalidateQueries('eventsRequest');
+            dispatch({ type: 'SET_ADD_MODE', payload: {} });
+        },
+    });
+
     const eventsReq: EventRequest[] | undefined = queryClient.getQueryData([
         'eventsRequest',
     ]);
 
-    const handleAddEventReq = (e: React.FormEvent<HTMLFormElement>) => {
+    const { state, dispatch } = useAppContext();
+    const editMode = state.editing.isEditing;
+    const addMode = state.isAdding;
+    const editEventReq: EventRequest | undefined = state.editing.eventReq;
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const [eventNo, setEventNo] = useState<string>('');
+    const [customer, setCustomer] = useState<string>('');
+    const [facility, setFacility] = useState<string>('');
+    const [dateReq, setDateReq] = useState<Date>(currentDate);
+    const [dateHeld, setDateHeld] = useState<Date>(currentDate);
+    const [dateAuth, setDateAuth] = useState<Date | null>(null);
+    const [estAudience, setEstAudience] = useState<number>(0);
+    const [estCost, setEstCost] = useState<number>(0);
+    const [status, setStatus] = useState<string>('Pending');
+
+    useEffect(() => {
+        if (editMode && editEventReq) {
+            setEventNo(editEventReq.eventno);
+            setCustomer(editEventReq.custno);
+            setFacility(editEventReq.facno);
+            setDateReq(reverseFormatDate(editEventReq.datereq));
+            setDateHeld(reverseFormatDate(editEventReq.dateheld));
+            setDateAuth(
+                editEventReq.dateauth
+                    ? reverseFormatDate(editEventReq.dateauth)
+                    : null
+            );
+            setEstAudience(editEventReq.estaudience);
+            setEstCost(editEventReq.estcost);
+            setStatus(editEventReq.status);
+        }
+        if (state.isAdding) {
+            setEventNo(generateEventNo(eventsReq));
+            setCustomer('');
+            setFacility('');
+            setDateReq(currentDate);
+            setDateHeld(currentDate);
+            setDateAuth(null);
+            setEstAudience(0);
+            setEstCost(0);
+            setStatus('Pending');
+        }
+    }, [state]);
+
+    const handleAddEventReq = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         const newEventReq: EventRequest = {
-            eventno: generateEventNo(eventsReq),
+            eventno: eventNo,
             dateheld: formatDate(dateHeld),
             datereq: formatDate(dateReq),
             custno: customer,
@@ -57,14 +115,41 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
         createEventReqMutation.mutate(newEventReq);
     };
 
+    const handleUpdateEventReq = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        const updateEventReq: EventRequest = {
+            eventno: eventNo,
+            custno: customer,
+            facno: facility,
+            dateheld: formatDate(dateHeld),
+            datereq: formatDate(dateReq),
+            dateauth: dateAuth ? formatDate(dateAuth) : null,
+            estcost: estCost,
+            estaudience: estAudience,
+            status: status,
+            budno: 'B1000',
+        };
+        updateEventReqMutation.mutate(updateEventReq);
+    };
+
+    const handleDeleteEventReq = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        if (editEventReq) {
+            window.confirm(
+                `Se va a eliminar el evento ${editEventReq.eventno}, ¿está seguro?`
+            )
+                ? deleteEventReqMutation.mutate(editEventReq.eventno)
+                : console.log('No eliminado');
+        }
+    };
+
     return (
         <>
             <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-lg">
                     <h1 className="text-center text-2xl font-bold text-indigo-600 sm:text-3xl">
-                        Events Request
+                        Events Request Rest APP
                     </h1>
-                    <p>{editMode ? 'editing' : 'adding'}</p>
                     <p className="mx-auto mt-4 max-w-md text-center text-gray-500">
                         Aplicación CRUD para consumir una API REST de eventos
                         usando Oracle Rest Data Services (ORDS) y Oracle XE.
@@ -73,7 +158,6 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                     <form
                         action=""
                         className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 bg-[#30343f]"
-                        onSubmit={handleAddEventReq}
                     >
                         <p className="text-center text-lg font-medium text-white">
                             {addMode
@@ -84,16 +168,18 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                         <div className="mt-8 grid grid-cols-6 gap-6">
                             <div className="col-span-6 sm:col-span-3">
                                 <label
-                                    htmlFor="HeadlineAct"
+                                    htmlFor="customerSelect"
                                     className="block text-sm font-medium text-white"
                                 >
                                     Customer
                                 </label>
 
                                 <select
-                                    name="HeadlineAct"
-                                    id="HeadlineAct"
                                     className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
+                                    name="customerSelect"
+                                    id="customerSelect"
+                                    required
+                                    value={customer}
                                     onChange={(e) => {
                                         setCustomer(e.target.value);
                                     }}
@@ -118,16 +204,18 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
 
                             <div className="col-span-6 sm:col-span-3">
                                 <label
-                                    htmlFor="HeadlineAct"
+                                    htmlFor="facilitySelect"
                                     className="block text-sm font-medium text-white"
                                 >
                                     Facility
                                 </label>
 
                                 <select
-                                    name="HeadlineAct"
-                                    id="HeadlineAct"
                                     className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
+                                    name="facilitySelect"
+                                    id="facilitySelect"
+                                    required
+                                    value={facility}
                                     onChange={(e) => {
                                         setFacility(e.target.value);
                                     }}
@@ -160,11 +248,13 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     Date of request
                                 </label>
                                 <DatePicker
-                                    selected={dateReq}
-                                    onChange={(date: Date) => setDateReq(date)}
-                                    dateFormat="dd/MM/yyyy"
                                     className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
                                     name="dateReqPicker"
+                                    placeholderText="Select a date..."
+                                    dateFormat="dd/MM/yyyy"
+                                    required
+                                    selected={dateReq}
+                                    onChange={(date: Date) => setDateReq(date)}
                                 />
                             </div>
                             <div className="col-span-6 sm:col-span-3">
@@ -175,11 +265,13 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     Date held
                                 </label>
                                 <DatePicker
-                                    selected={dateHeld}
-                                    onChange={(date: Date) => setDateHeld(date)}
-                                    dateFormat="dd/MM/yyyy"
                                     className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
                                     name="dateHeldPicker"
+                                    placeholderText="Select a date..."
+                                    dateFormat="dd/MM/yyyy"
+                                    required
+                                    selected={dateHeld}
+                                    onChange={(date: Date) => setDateHeld(date)}
                                 />
                             </div>
                         </div>
@@ -194,13 +286,14 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                         Date of authorization
                                     </label>
                                     <DatePicker
+                                        className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
                                         name="dateAuthPicker"
+                                        placeholderText="Select a date..."
+                                        dateFormat="dd/MM/yyyy"
                                         selected={dateAuth}
                                         onChange={(date: Date) =>
                                             setDateAuth(date)
                                         }
-                                        dateFormat="dd/MM/yyyy"
-                                        className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
                                     />
                                 </div>
                             </div>
@@ -215,16 +308,17 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     Estimate audience
                                 </label>
                                 <input
+                                    className="h-10 w-full rounded border-gray-200 sm:text-sm"
                                     name="audienceEstimateInput"
+                                    id="audienceEstimateInput"
                                     type="number"
-                                    id="Quantity"
+                                    required
                                     value={estAudience}
                                     onChange={(e) => {
                                         setEstAudience(
                                             parseInt(e.target.value)
                                         );
                                     }}
-                                    className="h-10 w-full rounded border-gray-200 sm:text-sm"
                                 />
                             </div>
 
@@ -236,14 +330,15 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     Estimated cost
                                 </label>
                                 <input
+                                    className="h-10 w-full rounded border-gray-200 sm:text-sm"
                                     name="audienceEstimateInput"
+                                    id="audienceEstimateInput"
                                     type="number"
-                                    id="Quantity"
+                                    required
                                     value={estCost}
                                     onChange={(e) => {
                                         setEstCost(parseInt(e.target.value));
                                     }}
-                                    className="h-10 w-full rounded border-gray-200 sm:text-sm"
                                 />
                             </div>
                         </div>
@@ -258,11 +353,11 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                 </label>
 
                                 <select
+                                    className="h-10 w-full rounded border-gray-200 text-sm shadow-sm"
                                     name="statusSelect"
                                     id="statusSelect"
-                                    className="h-10 w-full rounded-lg border-gray-200 text-sm shadow-sm"
+                                    value={status}
                                     onChange={(e) => {
-                                        console.log(e.target.value);
                                         setStatus(e.target.value);
                                     }}
                                 >
@@ -274,12 +369,21 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                             </div>
                         ) : null}
 
-                        <button
-                            type="submit"
-                            className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
-                        >
-                            {addMode ? 'Agregar evento' : 'Editar evento'}
-                        </button>
+                        {editMode ? (
+                            <ActionButtons
+                                handleUpdateEventReq={handleUpdateEventReq}
+                                handleDeleteEventReq={handleDeleteEventReq}
+                            />
+                        ) : (
+                            <button
+                                className="block px-5 py-3 ml-auto mr-auto w-sm rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-800"
+                                onClick={(e) => {
+                                    handleAddEventReq(e);
+                                }}
+                            >
+                                Agregar evento
+                            </button>
+                        )}
                     </form>
                 </div>
             </div>

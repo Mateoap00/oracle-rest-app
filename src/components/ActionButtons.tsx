@@ -1,31 +1,37 @@
 import { useAppContext } from '../AppContext';
-export const ActionButtons = () => {
-    const { dispatch } = useAppContext();
+
+type ActionButtonsProps = {
+    handleUpdateEventReq: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    handleDeleteEventReq: (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
+export const ActionButtons: React.FC<ActionButtonsProps> = ({
+    handleUpdateEventReq,
+    handleDeleteEventReq,
+}) => {
+    const editMode = useAppContext().state.editing.isEditing;
 
     return (
         <>
-            <button
-                className="inline-block rounded bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700"
-                onClick={() => {
-                    dispatch({
-                        type: 'SET_EDIT_MODE',
-                        payload: {},
-                    });
-                }}
-            >
-                Editar
-            </button>
-            <button
-                className="inline-block rounded bg-red-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700"
-                onClick={() => {
-                    dispatch({
-                        type: 'SET_EDIT_MODE',
-                        payload: {},
-                    });
-                }}
-            >
-                Eliminar
-            </button>
+            {editMode ? (
+                <>
+                    <button
+                        className="block px-5 py-3 ml-auto mr-auto w-sm rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-800"
+                        onClick={(e) => {
+                            handleUpdateEventReq(e);
+                        }}
+                    >
+                        Editar
+                    </button>
+                    <button
+                        className="block px-5 py-3 ml-auto mr-auto w-sm rounded-lg bg-red-600 text-sm font-medium text-white hover:bg-red-800"
+                        onClick={(e) => {
+                            handleDeleteEventReq(e);
+                        }}
+                    >
+                        Eliminar
+                    </button>
+                </>
+            ) : null}
         </>
     );
 };
