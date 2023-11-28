@@ -3,13 +3,13 @@ import { useAppContext } from '../AppContext';
 import { EventsRow } from './EventsRow';
 
 type EventsTableProps = {
-    eventsReq: EventRequest[];
+    eventsReq: EventRequest[] | undefined;
 };
 
 const EventsTable: React.FC<EventsTableProps> = ({ eventsReq }) => {
-    // const { dispatch } = useAppContext();
     const editMode = useAppContext().state.editing.isEditing;
     const eventReq = useAppContext().state.editing.eventReq;
+
     return (
         <>
             <div className="overflow-x-auto">
@@ -17,35 +17,35 @@ const EventsTable: React.FC<EventsTableProps> = ({ eventsReq }) => {
                     <thead className="ltr:text-left rtl:text-right">
                         <tr>
                             <th className="whitespace-nowrap px-2 py-2 font-large text-black dark:text-white"></th>
-                            <th className="whitespace-nowrap px-2 py-2 font-large text-black dark:text-white">
-                                eventNo
+                            <th className="whitespace-nowrap px-2 py-2 font-large bg-gray-200 text-black dark:text-white">
+                                EVENTNO
                             </th>
                             <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                budNo
+                                CUSTNO
+                            </th>
+                            <th className="whitespace-nowrap px-4 py-2 font-large bg-gray-200 text-black dark:text-white">
+                                FACNO
                             </th>
                             <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                custNo
+                                BUDNO
+                            </th>
+                            <th className="whitespace-nowrap px-4 py-2 font-large bg-gray-200 text-black dark:text-white">
+                                DATEREQ
                             </th>
                             <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                facNo
+                                DATEHELD
+                            </th>
+                            <th className="whitespace-nowrap px-4 py-2 font-large bg-gray-200 text-black dark:text-white">
+                                DATEAUTH
                             </th>
                             <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                dateReq
+                                ESTAUDIENCE
+                            </th>
+                            <th className="whitespace-nowrap px-4 py-2 font-large bg-gray-200 text-black dark:text-white">
+                                ESTCOST
                             </th>
                             <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                dateHeld
-                            </th>
-                            <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                dateAuth
-                            </th>
-                            <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                estAudience
-                            </th>
-                            <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                estCost
-                            </th>
-                            <th className="whitespace-nowrap px-4 py-2 font-large text-black dark:text-white">
-                                status
+                                STATUS
                             </th>
                         </tr>
                     </thead>

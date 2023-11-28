@@ -15,6 +15,7 @@ import { generateEventNo } from '../utils/generateEventNo';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ActionButtons } from './ActionButtons';
+import toast from 'react-hot-toast';
 
 type EventsFormProps = {
     customers: Customers[];
@@ -26,24 +27,46 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
 
     const createEventReqMutation = useMutation({
         mutationFn: createEventRequest,
-        onSuccess: () => {
-            queryClient.invalidateQueries('eventsRequest');
+        onSuccess: (data) => {
+            if (typeof data === 'string' && data !== '') {
+                toast.dismiss();
+                toast.error('Error, información no valida para el evento.');
+            } else {
+                toast.dismiss();
+                toast.success('Evento agregado exitosamente.');
+                setTimeout(() => {
+                    queryClient.invalidateQueries('eventsRequest');
+                }, 1000);
+            }
         },
     });
 
     const updateEventReqMutation = useMutation({
         mutationFn: updateEventRequest,
-        onSuccess: () => {
-            queryClient.invalidateQueries('eventsRequest');
-            dispatch({ type: 'SET_ADD_MODE', payload: {} });
+        onSuccess: (data) => {
+            if (typeof data === 'string' && data !== '') {
+                toast.dismiss();
+                toast.error('Error, información no valida para el evento.');
+            } else {
+                toast.dismiss();
+                toast.success('Evento editado exitosamente.');
+                setTimeout(() => {
+                    queryClient.invalidateQueries('eventsRequest');
+                    dispatch({ type: 'SET_ADD_MODE', payload: {} });
+                }, 1000);
+            }
         },
     });
 
     const deleteEventReqMutation = useMutation({
         mutationFn: deleteEventRequest,
         onSuccess: () => {
-            queryClient.invalidateQueries('eventsRequest');
-            dispatch({ type: 'SET_ADD_MODE', payload: {} });
+            toast.dismiss();
+            toast.success('Evento eliminado exitosamente.');
+            setTimeout(() => {
+                queryClient.invalidateQueries('eventsRequest');
+                dispatch({ type: 'SET_ADD_MODE', payload: {} });
+            }, 1000);
         },
     });
 
@@ -145,7 +168,7 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
 
     return (
         <>
-            <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-screen-xl px-4 py-4 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-lg">
                     <h1 className="text-center text-2xl font-bold text-indigo-600 sm:text-3xl">
                         Events Request Rest APP
@@ -185,7 +208,7 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     }}
                                 >
                                     <option value="">
-                                        Select a customer...
+                                        Seleccionar customer...
                                     </option>
                                     {customers.map((customer) => {
                                         return (
@@ -221,7 +244,7 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     }}
                                 >
                                     <option value="">
-                                        Select a facility...
+                                        Seleccionar facility...
                                     </option>
                                     {facilities.map((facility) => {
                                         return (
@@ -313,6 +336,7 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     id="audienceEstimateInput"
                                     type="number"
                                     required
+                                    min={0}
                                     value={estAudience}
                                     onChange={(e) => {
                                         setEstAudience(
@@ -335,6 +359,7 @@ const EventsForm: React.FC<EventsFormProps> = ({ customers, facilities }) => {
                                     id="audienceEstimateInput"
                                     type="number"
                                     required
+                                    min={0}
                                     value={estCost}
                                     onChange={(e) => {
                                         setEstCost(parseInt(e.target.value));

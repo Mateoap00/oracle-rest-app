@@ -28,8 +28,48 @@ type CustomersRequest = {
     links: Links[];
 };
 
+export type EventOfCustomer = {
+    custno: string;
+    custname: string;
+    address: string;
+    phone: string;
+    city: string;
+    eventno: string;
+    dateheld: string;
+    datereq: string;
+    dateauth: string | null;
+    status: string;
+};
+
+type AllEventsOfCustomer = {
+    items: EventOfCustomer[];
+    hasMore: boolean;
+    limit: number;
+    offset: number;
+    count: number;
+    links: Links[];
+};
+
 export const getCustomers = async () => {
-    const response: AxiosResponse<CustomersRequest> = await axios.get(baseUrl);
-    const data: Customers[] = response.data.items;
-    return data;
+    try {
+        const response: AxiosResponse<CustomersRequest> =
+            await axios.get(baseUrl);
+        const data: Customers[] = response.data.items;
+        return data;
+    } catch (err) {
+        console.log(err);
+        return [];
+    }
+};
+
+export const getAllEventsOfCustomer = async (custno: string) => {
+    try {
+        const response: AxiosResponse<AllEventsOfCustomer> = await axios.get(
+            `${baseUrl}${custno}`
+        );
+        const data: EventOfCustomer[] = response.data.items;
+        return data;
+    } catch (err) {
+        console.log(err);
+    }
 };

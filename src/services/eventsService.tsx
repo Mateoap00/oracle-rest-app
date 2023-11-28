@@ -30,27 +30,40 @@ type EventRequestData = {
 };
 
 export const getEventsRequest = async () => {
-    const response: AxiosResponse<EventRequestData> = await axios.get(baseUrl);
-    const data: EventRequest[] = response.data.items;
-    return data;
+    try {
+        const response: AxiosResponse<EventRequestData> =
+            await axios.get(baseUrl);
+        const data: EventRequest[] = response.data.items;
+        return data;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 export const createEventRequest = async (eventReq: EventRequest) => {
-    const response: AxiosResponse<EventRequest> = await axios.post(
-        baseUrl,
-        eventReq
-    );
-    const data: EventRequest = response.data;
-    return data;
+    try {
+        const response: AxiosResponse<EventRequest> = await axios.post(
+            baseUrl,
+            eventReq
+        );
+        const data: EventRequest = response.data;
+        return data;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 export const updateEventRequest = async (eventReq: EventRequest) => {
-    const response: AxiosResponse<EventRequest> = await axios.put(
-        baseUrl,
-        eventReq
-    );
-    const data: EventRequest = response.data;
-    return data;
+    try {
+        const response: AxiosResponse<EventRequest> = await axios.put(
+            baseUrl,
+            eventReq
+        );
+        const data: EventRequest = response.data;
+        return data;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 export const deleteEventRequest = async (eventno: string) => {
