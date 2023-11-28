@@ -1,0 +1,57 @@
+Base ORDS URL : http://localhost:8080/ords/
+Schema (alias): http://localhost:8080/ords/base2/
+Module        : http://localhost:8080/ords/base2/rest-v1/
+Template      : http://localhost:8080/ords/base2/rest-v1/request/
+
+Module : A container for one or more templates, with an associated path (rest-v1/).
+Template : A container for one or more handlers. The template must be unique within the module and is associated with a specific path (employees/), which may or may not include parameters.
+Handler : A link to the actual work that is done. Typical handler methods include GET, POST, PUT, DELETE, which are passed in the HTTP header, rather than the URL. Each handler is associated with a specific source (or action), which can be of several types.
+
+The web service supports the following URLs, methods, headers and payloads.
+
+READ: All eventrequest.
+http://localhost:8080/ords/base2/rest-v1/request/
+READ: One eventrequest.
+http://localhost:8080/ords/base2/rest-v1/request/E101
+
+
+INSERT
+URL        : http://localhost:8080/ords/eventos/rest-v1/request/
+Method     : POST
+Header     : Content-Type: application/json
+Raw Payload: {"eventno": "E711","dateheld": "23-NOV-23","datereq": "28-JUL-23","custno": "C100","facno": "F100",
+    "dateauth": "23-JUL-22","status": "Approved","estcost": 5000,"estaudience": 80000,"budno": "B1000"
+}
+
+UPDATE
+URL        : http://localhost:8080/ords/eventos/rest-v1/request/
+Method     : PUT
+Header     : Content-Type: application/json
+Raw Payload: {        "eventno": "E711",        "dateheld": "01-NOV-23",        "datereq": "01-NOV-23",        "custno": "C100",        "facno": "F100",        "dateauth": "01-NOV-23",        "status": "Pending",        "estcost": 15000,
+    "estaudience": 50000,        "budno": "B1000"
+}
+
+DELETE
+URL        : http://localhost:8080/ords/eventos/rest-v1/request/
+Method     : DELETE
+Header     : Content-Type: application/json
+Raw Payload: {
+    "eventno": "E711"
+}
+
+READ : All customers.
+    http://localhost:8080/ords/base2/rest-v1/customers/
+READ : One Customer and it's events.
+    http://localhost:8080/ords/base2/rest-v1/customers/C100
+
+
+READ: All facilities.
+    http://localhost:8080/ords/base2/rest-v1/facilities/
+READ: One Facility and it's events.
+    http://localhost:8080/ords/base2/rest-v1/facilities/F101
+
+
+READ: All audt-eventrequests.
+    http://localhost:8080/ords/base2/rest-v1/audt-eventrequests/
+READ: One audt-eventrequests
+    http://localhost:8080/ords/base2/rest-v1/audt-eventrequests/1
