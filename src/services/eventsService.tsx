@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-const baseUrl = 'http://localhost:8080/ords/base2/rest-v1/request/';
+const baseUrl = 'http://localhost:8080/ords/base4/rest-v1/request/';
 
 export type EventRequest = {
     eventno: string;

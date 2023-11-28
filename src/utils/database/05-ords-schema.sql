@@ -1,20 +1,4 @@
--- Ejecutar scripts 01, 02, y 03 antes de ejecutar este script.
-
--- Conectado como base2.
-CONN base2/Clases.2023@freepdb1
-
--- Habilitar ORDS.
-BEGIN
-  ORDS.enable_schema(
-    p_enabled             => TRUE,
-    p_schema              => 'base2',
-    p_url_mapping_type    => 'BASE_PATH',
-    p_url_mapping_pattern => 'eventos',
-    p_auto_rest_auth      => FALSE
-  );
-    
-  COMMIT;
-END;
+-- Conectado como base2;
 
 -- Ver esquemas habilitados.
 SELECT parsing_schema, pattern
@@ -28,16 +12,6 @@ FROM   user_ords_schemas;
 -- Schema (alias): http://localhost:8080/ords/base2/
 -- Module        : http://localhost:8080/ords/base2/rest-v1/
 -- Template      : http://localhost:8080/ords/base2/rest-v1/request/
-
--- Ver Modules.
-SELECT id, name, uri_prefix
-FROM   user_ords_modules
-ORDER BY name;
-
--- Ver Templates.
-SELECT id, module_id, uri_template
-FROM   user_ords_templates
-ORDER BY module_id;
 
 -- Implementación de los procedimientos para los métodos GET, POST, PUT y DELETE para la tabla EVENTREQUEST.
 
@@ -229,3 +203,124 @@ END;
 -- Raw Payload: {
 --         "eventno": "E711"
 --     }
+
+-- Conectado como base2.
+
+BEGIN  
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'customers/');
+
+  -- READ : All customers.
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'customers/',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM customer ORDER BY custno',
+    p_items_per_page => 0);
+
+  -- READ : One Customer and it's events.
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'customers/:custno');
+
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'customers/:custno',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM view_customer_eventrequest WHERE custno = :custno',
+    p_items_per_page => 0);
+
+  COMMIT;
+END;
+
+-- READ : All customers.
+-- http://localhost:8080/ords/base2/rest-v1/customers/
+-- READ : One Customer and it's events.
+-- http://localhost:8080/ords/base2/rest-v1/customers/C100
+
+-- Conectado como base2.
+
+BEGIN  
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'facilities/');
+
+  -- READ : All facilities.
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'facilities/',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM facility ORDER BY facno',
+    p_items_per_page => 0);
+
+  -- READ : One Facility and it's events.
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'facilities/:facno');
+
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'facilities/:facno',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM view_facility_eventrequest WHERE facno = :facno',
+    p_items_per_page => 0);
+
+  COMMIT;
+END;
+
+-- READ: All facilities.
+-- http://localhost:8080/ords/base2/rest-v1/facilities/
+-- READ: One Facility and it's events.
+-- http://localhost:8080/ords/base2/rest-v1/facilities/F101
+
+-- Conectado como base2.
+
+BEGIN  
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'audt-eventrequests/');
+
+  -- READ : All audt-eventrequests.
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'audt-eventrequests/',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM auditoria_eventrequest ORDER BY id',
+    p_items_per_page => 0);
+
+  -- READ : One audt-eventrequests
+  ORDS.define_template(
+   p_module_name    => 'rest-v1',
+   p_pattern        => 'audt-eventrequests/:id');
+
+  ORDS.define_handler(
+    p_module_name    => 'rest-v1',
+    p_pattern        => 'audt-eventrequests/:id',
+    p_method         => 'GET',
+    p_source_type    => ORDS.source_type_collection_feed,
+    p_source         => 'SELECT * FROM auditoria_eventrequest WHERE id = :id',
+    p_items_per_page => 0);
+
+  COMMIT;
+END;
+
+-- READ: All audt-eventrequests.
+-- http://localhost:8080/ords/base2/rest-v1/audt-eventrequests/
+-- READ: One audt-eventrequests
+-- http://localhost:8080/ords/base2/rest-v1/audt-eventrequests/1
+
+-- Ver Modules.
+SELECT id, name, uri_prefix
+FROM   user_ords_modules
+ORDER BY name;
+
+-- Ver Templates.
+SELECT id, module_id, uri_template
+FROM   user_ords_templates
+ORDER BY module_id;

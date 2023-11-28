@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-const baseUrl = 'http://localhost:8080/ords/base2/rest-v1/facilities/';
+const baseUrl = 'http://localhost:8080/ords/base4/rest-v1/facilities/';
 
 export type Facilities = {
     facno: string;
