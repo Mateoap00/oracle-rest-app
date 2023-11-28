@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
+import { userName } from '../utils/database/user-name';
 
-const baseUrl = 'http://localhost:8080/ords/base4/rest-v1/facilities/';
+const baseUrl = `http://localhost:8080/ords/${userName}/rest-v1/facilities/`;
 
 export type Facilities = {
     facno: string;
