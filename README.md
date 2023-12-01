@@ -27,6 +27,6 @@ Este proyecto es una aplicación de React que permite realizar operaciones CRUD 
 
 Los componentes principales de la aplicación son:
 
--   **EventsForm:** Un formulario para crear, actualizar y eliminar solicitudes de eventos. Toma una lista de clientes e instalaciones como props. ![EventsForm](./public/EventsForm.png)
--   **EventsTable:** Una tabla que muestra una lista de solicitudes de eventos. Toma una lista de solicitudes de eventos como props. ![EventsTable](./public/EventsTable.png)
--   **AudtsEventsReqTable:** Una tabla que muestra una lista de auditoria para los tipos de operaciones que se realizan en la base de datos. Toma una lista con la información de cada operación como props. ![AudtsEventsReqTable](./public/AudtsEventsTale.png)
+-   **EventsForm:** Un formulario para crear, actualizar y eliminar solicitudes de eventos. ![EventsForm](./public/EventsForm.png)
+-   **EventsTable:** Una tabla que muestra una lista de solicitudes de eventos. ![EventsTable](./public/EventsTable.png)
+-   **AudtsEventsReqTable:** Una tabla que muestra una lista de auditoria para los tipos de operaciones que se realizan en la base de datos. ![AudtsEventsReqTable](./public/AudtsEventsTale.png)
